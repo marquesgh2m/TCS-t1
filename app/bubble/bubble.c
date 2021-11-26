@@ -19,13 +19,13 @@ void bs(void) {
     printf("\nSorted array: \n");
     printArray(arr, n);
 
-    for(;;);
+//    for(;;);
 }
 
 void bist(void) {
     printf("I am bist\n");
 
-    for(;;);
+//    for(;;);
 }
 
 void sabota(void) {

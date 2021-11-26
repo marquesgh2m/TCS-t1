@@ -3,11 +3,11 @@ image.elf: formato do arquivo elf32-littleriscv
 
 Seções:
 Idx Name          Tam.      VMA       LMA       File off  Algn
-  0 .text         00002974  40000000  40000000  00001000  2**2
+  0 .text         00002970  40000000  40000000  00001000  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .rodata       00000748  40002974  40002974  00003974  2**2
+  1 .rodata       00000748  40002970  40002970  00003970  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  2 .data         00000074  400030bc  400030bc  000040bc  2**2
+  2 .data         00000078  400030b8  400030b8  000040b8  2**2
                   CONTENTS, ALLOC, LOAD, DATA
   3 .bss          0007b364  40003130  40003130  00004130  2**2
                   ALLOC
