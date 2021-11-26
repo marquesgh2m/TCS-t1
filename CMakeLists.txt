@@ -1,0 +1,222 @@
+cmake_minimum_required(VERSION 3.20)
+project(TCS_t1 C)
+
+set(CMAKE_C_STANDARD 11)
+
+include_directories(app/coremark)
+include_directories(app/coremark/hf_risc)
+include_directories(app/coremark/hf_riscv)
+include_directories(app/img_filter)
+include_directories(app/queue_sec)
+include_directories(arch/arm/versatilepb/include)
+include_directories(arch/mips/hf-risc/include)
+include_directories(arch/mips/pic32mz_chipkit-wifire/include)
+include_directories(arch/mips/pic32mz_starter-kit/include)
+include_directories(arch/mips/plasma/include)
+include_directories(arch/riscv/hf-riscv/include)
+include_directories(arch/riscv/riscv32-qemu/include)
+include_directories(arch/riscv/riscv64-qemu/include)
+include_directories(drivers/block/include)
+include_directories(drivers/device/include)
+include_directories(drivers/noc/include)
+include_directories(drivers/spi/include)
+include_directories(fs/include)
+include_directories(lib/include)
+include_directories(net/include)
+include_directories(sys/include)
+include_directories(usr/sim/mpsoc_sim/source)
+
+add_executable(TCS_t1
+        app/block_resume_kill/brk.c
+        app/bubble/bubble.c
+        app/cond_test1/cond_test1.c
+        app/cond_test2/cond_test2.c
+        app/coremark/hf_risc/core_portme.c
+        app/coremark/hf_risc/core_portme.h
+        app/coremark/hf_riscv/core_portme.c
+        app/coremark/hf_riscv/core_portme.h
+        app/coremark/core_list_join.c
+        app/coremark/core_main.c
+        app/coremark/core_matrix.c
+        app/coremark/core_portme.c
+        app/coremark/core_portme.h
+        app/coremark/core_state.c
+        app/coremark/core_util.c
+        app/coremark/coremark.c
+        app/coremark/coremark.h
+        app/dwt_filter/dwt97.c
+        app/hello/hello.c
+        app/img_filter/filter.c
+        app/img_filter/image.h
+        app/lists/lists.c
+        app/malloc_test/malloctest.c
+        app/mutex_test1/mutex_test1.c
+        app/noc_rpc1/noc_rpc1.c
+        app/noc_test/noc_test.c
+        app/noc_test2/noc_test2.c
+        app/noc_test3/noc_test3.c
+        app/noc_test4/noc_test4.c
+        app/noc_test5/noc_test5.c
+        app/queue_sec/sec_queue.c
+        app/queue_sec/sec_sendrecv.c
+        app/queue_sec/sec_sendrecv.h
+        app/queue_sec/xtea.c
+        app/queue_sec/xtea.h
+        app/queues/queues.c
+        app/queues2/queues2.c
+        app/ramdisk/ramdisk_test.c
+        app/readers_writers/readers_writers.c
+        app/rel/dynamic.c
+        app/rel/rel.c
+        app/sched_test1/sched_test1.c
+        app/sched_test2/sched_test2.c
+        app/sched_test3/sched_test3.c
+        app/sched_test4/sched_test4.c
+        app/sem_test1/sem_test1.c
+        app/sem_test2/sem_test2.c
+        app/spi_test/spi_test.c
+        app/task_create_kill/create_kill.c
+        app/test_double/test_double.c
+        app/test_float/test_float.c
+        app/ustack_raw/ustack_raw.c
+        app/ustack_uudp/ustack_uudp.c
+        app/ustack_uudp2/ustack_uudp.c
+        arch/arm/versatilepb/drivers/hal.c
+        arch/arm/versatilepb/drivers/interrupt.c
+        arch/arm/versatilepb/include/hal.h
+        arch/arm/versatilepb/include/interrupt.h
+        arch/arm/versatilepb/lib/__aeabi_idiv.c
+        arch/arm/versatilepb/lib/__aeabi_uidiv.c
+        arch/arm/versatilepb/lib/__ashldi3.c
+        arch/arm/versatilepb/lib/__ashrdi3.c
+        arch/arm/versatilepb/lib/__clzdi2.c
+        arch/arm/versatilepb/lib/__clzsi2.c
+        arch/arm/versatilepb/lib/__divdi3.c
+        arch/arm/versatilepb/lib/__divsi3.c
+        arch/arm/versatilepb/lib/__lshrdi3.c
+        arch/arm/versatilepb/lib/__moddi3.c
+        arch/arm/versatilepb/lib/__modsi3.c
+        arch/arm/versatilepb/lib/__muldi3.c
+        arch/arm/versatilepb/lib/__udivdi3.c
+        arch/arm/versatilepb/lib/__udivmoddi4.c
+        arch/arm/versatilepb/lib/__udivmodsi4.c
+        arch/arm/versatilepb/lib/__udivsi3.c
+        arch/arm/versatilepb/lib/__umoddi3.c
+        arch/arm/versatilepb/lib/__umodsi3.c
+        arch/mips/hf-risc/drivers/eth_enc28j60.c
+        arch/mips/hf-risc/drivers/hal.c
+        arch/mips/hf-risc/drivers/interrupt.c
+        arch/mips/hf-risc/include/eth_enc28j60.h
+        arch/mips/hf-risc/include/hal.h
+        arch/mips/hf-risc/include/interrupt.h
+        arch/mips/pic32mz_chipkit-wifire/drivers/hal.c
+        arch/mips/pic32mz_chipkit-wifire/drivers/interrupt.c
+        arch/mips/pic32mz_chipkit-wifire/include/hal.h
+        arch/mips/pic32mz_chipkit-wifire/include/interrupt.h
+        arch/mips/pic32mz_chipkit-wifire/include/pic32mz.h
+        arch/mips/pic32mz_starter-kit/drivers/eth_enc28j60.c
+        arch/mips/pic32mz_starter-kit/drivers/ethernet.c
+        arch/mips/pic32mz_starter-kit/drivers/hal.c
+        arch/mips/pic32mz_starter-kit/drivers/interrupt.c
+        arch/mips/pic32mz_starter-kit/include/eth_enc28j60.h
+        arch/mips/pic32mz_starter-kit/include/ethernet.h
+        arch/mips/pic32mz_starter-kit/include/hal.h
+        arch/mips/pic32mz_starter-kit/include/interrupt.h
+        arch/mips/pic32mz_starter-kit/include/pic32mz.h
+        arch/mips/plasma/drivers/hal.c
+        arch/mips/plasma/drivers/interrupt.c
+        arch/mips/plasma/drivers/ni.c
+        arch/mips/plasma/include/hal.h
+        arch/mips/plasma/include/interrupt.h
+        arch/mips/plasma/include/ni.h
+        arch/riscv/hf-riscv/drivers/eth_enc28j60.c
+        arch/riscv/hf-riscv/drivers/hal.c
+        arch/riscv/hf-riscv/drivers/interrupt.c
+        arch/riscv/hf-riscv/include/eth_enc28j60.h
+        arch/riscv/hf-riscv/include/hal.h
+        arch/riscv/hf-riscv/include/interrupt.h
+        arch/riscv/riscv32-qemu/drivers/hal.c
+        arch/riscv/riscv32-qemu/include/hal.h
+        arch/riscv/riscv32-qemu/include/interrupt.h
+        arch/riscv/riscv64-qemu/drivers/hal.c
+        arch/riscv/riscv64-qemu/include/hal.h
+        arch/riscv/riscv64-qemu/include/interrupt.h
+        drivers/block/include/block.h
+        drivers/block/include/ramdisk.h
+        drivers/block/include/sdcard.h
+        drivers/block/ramdisk.c
+        drivers/block/sdcard.c
+        drivers/device/include/device.h
+        drivers/device/device.c
+        drivers/noc/include/ni_generic.h
+        drivers/noc/include/noc.h
+        drivers/noc/include/noc_rpc.h
+        drivers/noc/ni_hermes.c
+        drivers/noc/noc.c
+        drivers/noc/noc_rpc.c
+        drivers/spi/include/eeprom25lcxx.h
+        drivers/spi/include/enc28j60.h
+        drivers/spi/include/mcp23s17.h
+        drivers/spi/include/nrf24l01p.h
+        drivers/spi/include/spi.h
+        drivers/spi/include/sram23lcxx.h
+        drivers/spi/eeprom25lcxx.c
+        drivers/spi/enc28j60.c
+        drivers/spi/mcp23s17.c
+        drivers/spi/nrf24l01p.c
+        drivers/spi/spi.c
+        drivers/spi/sram23lcxx.c
+        fs/include/uhfs.h
+        fs/include/uhfs_ecodes.h
+        fs/uhfs.c
+        lib/include/crc.h
+        lib/include/fixed.h
+        lib/include/libc.h
+        lib/include/math.h
+        lib/libc/libc.c
+        lib/libc/math.c
+        lib/misc/crc.c
+        net/include/ustack.h
+        net/include/uudp.h
+        net/ustack/arp.c
+        net/ustack/bootp.c
+        net/ustack/eth_netif.c
+        net/ustack/icmp.c
+        net/ustack/ip.c
+        net/ustack/udp.c
+        net/uudp/uudp.c
+        sys/include/condvar.h
+        sys/include/ecodes.h
+        sys/include/hellfire.h
+        sys/include/kernel.h
+        sys/include/kprintf.h
+        sys/include/list.h
+        sys/include/main.h
+        sys/include/malloc.h
+        sys/include/mutex.h
+        sys/include/panic.h
+        sys/include/processor.h
+        sys/include/queue.h
+        sys/include/scheduler.h
+        sys/include/semaphore.h
+        sys/include/task.h
+        sys/kernel/main.c
+        sys/kernel/panic.c
+        sys/kernel/processor.c
+        sys/kernel/scheduler.c
+        sys/kernel/task.c
+        sys/lib/kprintf.c
+        sys/lib/list.c
+        sys/lib/malloc.c
+        sys/lib/queue.c
+        sys/sync/condvar.c
+        sys/sync/mutex.c
+        sys/sync/semaphore.c
+        usr/sim/hf_risc_sim/hf_risc_sim.c
+        usr/sim/hf_riscv64_sim/hf_riscv64_sim.c
+        usr/sim/hf_riscv_sim/hf_riscv_sim.c
+        usr/sim/mpsoc_sim/source/mpsoc_sim.c
+        usr/sim/mpsoc_sim/source/noc.c
+        usr/sim/mpsoc_sim/source/noc.h
+        usr/tools/mips-toolchain/hello.c
+        usr/tools/mips-toolchain/mips.c)

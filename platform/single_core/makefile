@@ -40,6 +40,9 @@ image: hal libc kernel app
 	$(SIZE) image.elf
 	hexdump -v -e '4/1 "%02x" "\n"' image.bin > image.txt
 
+run: image
+	./sim image.bin
+
 clean:
 	rm -rf *.o *~ *.elf *.bin *.cnt *.lst *.sec *.txt *.map
 
