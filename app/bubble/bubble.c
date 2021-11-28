@@ -8,6 +8,7 @@
 
 //int arr_size = sizeof(arr)/sizeof(arr[0]);
 int bist_test_counter = 0;
+int arr[ARR_SIZE];
 
 
 
@@ -48,13 +49,14 @@ int LFSR(int v1, int v2){
 }
 
 
-void S1(int *addr, int addr_size, int *signature){
+void S1(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value; 
 
     printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
     for(i=0;i<addr_size;i++){
         //Ra
         value = *addr;
+        addr_groundtruth[i] = *addr; // Salva valor para usar como comparacao nas outras etapas
         *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
@@ -76,7 +78,7 @@ void S1(int *addr, int addr_size, int *signature){
 }
 
 
-void S2(int *addr, int addr_size, int *signature){
+void S2(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
     printf("\nS2:\t\t    Ra(not)\tWa\t\tRa\t\tWa(not)\n");
@@ -105,7 +107,7 @@ void S2(int *addr, int addr_size, int *signature){
 }
 
 
-void S3(int *addr, int addr_size, int *signature){
+void S3(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
     printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
@@ -135,7 +137,7 @@ void S3(int *addr, int addr_size, int *signature){
 }
 
 
-void S4(int *addr, int addr_size, int *signature){
+void S4(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
     printf("\nS4:\t\t    Ra\t\tWa(not)\t\tRa(not)\t\tWa\n");
@@ -164,7 +166,7 @@ void S4(int *addr, int addr_size, int *signature){
     printf("Signature4:%08x\n", *signature); 
 }
 
-void S1S(int *addr, int addr_size, int *signature){
+void S1S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
     printf("S1S:\t\t    Ra\n");
@@ -180,7 +182,7 @@ void S1S(int *addr, int addr_size, int *signature){
 }
 
 
-void S2S(int *addr, int addr_size, int *signature){
+void S2S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
     printf("\nS2S:\t\t    Ra(not)\tRa\n");
@@ -201,7 +203,7 @@ void S2S(int *addr, int addr_size, int *signature){
 }
 
 
-void S3S(int *addr, int addr_size, int *signature){
+void S3S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
     printf("\nS3S:\t\t    Ra(not)\n");
@@ -219,7 +221,7 @@ void S3S(int *addr, int addr_size, int *signature){
 }
 
 
-void S4S(int *addr, int addr_size, int *signature){
+void S4S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
     printf("\nS4S:\t\t    Ra\t\tRa(not)\t\t\n");
@@ -247,10 +249,13 @@ int bist_test(int *addr, int addr_size){
     int i;
     int value;
     int signature = 0;
-    S1(addr, addr_size, &signature);
-    S2(addr, addr_size, &signature);
-    S3(addr, addr_size, &signature);
-    S4(addr, addr_size, &signature);
+    int addr_groundtruth[addr_size];
+
+    S1(addr, addr_size, &signature, addr_groundtruth); 
+    S2(addr, addr_size, &signature, addr_groundtruth);
+    S3(addr, addr_size, &signature, addr_groundtruth);
+    sabotador(addr, addr_size); // SABOTADOR
+    S4(addr, addr_size, &signature, addr_groundtruth);
 
     printf("bist_test_sum:%08x\n", signature); 
     return signature;
@@ -261,30 +266,40 @@ int bist_signature(int *addr, int addr_size){
     int i;
     int value;
     int signature = 0;
+    int addr_groundtruth[addr_size];
 
-    S1S(addr, addr_size, &signature);
-    S2S(addr, addr_size, &signature);
-    S3S(addr, addr_size, &signature);
-    S4S(addr, addr_size, &signature);
+    S1S(addr, addr_size, &signature, addr_groundtruth);
+    S2S(addr, addr_size, &signature, addr_groundtruth);
+    S3S(addr, addr_size, &signature, addr_groundtruth);
+    S4S(addr, addr_size, &signature, addr_groundtruth);
 
     printf("bist_signature_sum:%08x\n", signature); 
     return signature;
 }
 
 void bist_th(void) {
-    hf_block(hf_id("main_routine_th"));
-
     int bist_test_sum, bist_signature_sum;
 
-    printf("\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
+    hf_block(hf_id("main_routine_th")); // Evita que o sistema operacional pare o bist na metade para executar a thread main_routine 
 
+    printf("\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
+    // Bist na area de memória do bubblesort
     bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
     bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
+    
 
-     printf("\nResults:\n");
+    printf("\nResults BubbleSort:\n");
     printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
     printf("bist_signature_sum:\t%08x\n", bist_signature_sum);
-    //sabotador(arr, arr_size);
+
+    // Bist na area de memória do vetor de dados (arr)
+    bist_test_sum = bist_test(arr, ARR_SIZE);
+    bist_signature_sum = bist_signature(arr, ARR_SIZE);
+
+    printf("\nResults Arr:\n");
+    printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
+    printf("bist_signature_sum:\t%08x\n", bist_signature_sum);
+    //sabotador(arr, ARR_SIZE);
 
     //sabotador(&bubbleSort, 18); // 18 é a quantidade de comandos assembly que implementam o bubblesort
     
@@ -303,8 +318,8 @@ void sabotador(int *aux, int depth){
     int random_bit = random() % 32;
     int random_adress = (int)(aux)+random_depth*4;
 
-    printf("RandomAdress(%d): %08x, RandomBit:%d\n", random_depth, random_adress, random_bit);
-    printf("FirstAddress: %08x, depth:%d\n", aux, depth);
+    //printf("RandomAdress(%d): %08x, RandomBit:%d\n", random_depth, random_adress, random_bit);
+    //printf("FirstAddress: %08x, depth:%d\n", aux, depth);
 
     for(i=0;i<depth;i++){
         if(i==random_depth){
@@ -319,7 +334,6 @@ void sabotador(int *aux, int depth){
 
 void main_routine_th(void) {
     int i;
-    int arr[ARR_SIZE];
 
     printf("\nbubbleSort addr: %08x \n", &bubbleSort);
     printf("arr addr: %08x \n", arr);
