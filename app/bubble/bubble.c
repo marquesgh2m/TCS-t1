@@ -52,7 +52,6 @@ void S1(int *addr, int addr_size, int *signature){
     int i, value; 
 
     printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
-
     for(i=0;i<addr_size;i++){
         //Ra
         value = *addr;
@@ -81,7 +80,6 @@ void S2(int *addr, int addr_size, int *signature){
     int i, value;
 
     printf("\nS2:\t\t    Ra(not)\tWa\t\tRa\t\tWa(not)\n");
-    
     for(i=0;i<addr_size;i++){
         //Ra(not)
         value = *addr;
@@ -186,7 +184,6 @@ void S2S(int *addr, int addr_size, int *signature){
     int i, value;
 
     printf("\nS2S:\t\t    Ra(not)\tRa\n");
-    
     for(i=0;i<addr_size;i++){
         //Ra(not)
         value = ~(*addr);
