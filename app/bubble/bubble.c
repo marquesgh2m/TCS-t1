@@ -45,7 +45,7 @@ void printArray(int arr[], int size)
 
 
 int LFSR(int v1, int v2){
-    return ~(v1&v2);
+    return (v1+v2)>>1;
 }
 
 
@@ -92,7 +92,8 @@ void S2(int *addr, int addr_size, int *signature, int read_only){
     
     for(i=0;i<addr_size;i++){
         //Ra(not)
-        value = *addr;
+        if(!read_only) value = *addr;
+        else value = ~(*addr);
         *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
@@ -128,7 +129,8 @@ void S3(int *addr, int addr_size, int *signature, int read_only){
     
     for(i=0;i<addr_size;i++){
         //Ra(not)
-        value = *addr;
+        if(!read_only) value = *addr;
+        else value = ~(*addr);
         *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
         if(read_only) printf("\n", value); 
@@ -172,7 +174,8 @@ void S4(int *addr, int addr_size, int *signature, int read_only){
         }
 
         //Ra(not)
-        value = *addr;
+        if(!read_only) value = *addr;
+        else value = ~(*addr);
         *signature = LFSR(*signature, value);
         printf("\t%08x", value); 
         if(read_only) printf("\n", value); 
