@@ -35,6 +35,8 @@ void printArray(int arr[], int size)
 void bist(void) {
     printf("I am bist\n");
     sabotador();
+    //sabotador(&bubbleSort, (int)((0x400002cc-(int)&bubbleSort)/4));
+    //sabotador(arr, arr_size);
 
     for(;;);
     //hf_kill(hf_selfid());
@@ -47,6 +49,12 @@ void sabotador(void) {
 void main_routine(void) {
     int arr[] = {19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
     int arr_size = sizeof(arr)/sizeof(arr[0]);
+
+    // Set random seed
+    srand(42); //srand(time(NULL)); 
+
+    printf("\nbubbleSort adress: %08x \n", &bubbleSort);
+    printf("arr adress: %08x \n", arr);
 
     printf("\n======\nBefore sorting array: \n");
     printArray(arr, arr_size);
