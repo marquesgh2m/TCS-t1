@@ -181,3 +181,8 @@ fabric.properties
 !.vscode/*.code-snippets
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,clion
+image.bin
+image.cnt
+image.lst
+image.sec
+image.txt
