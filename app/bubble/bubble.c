@@ -1,14 +1,32 @@
 // https://en.wikipedia.org/wiki/Bitwise_operations_in_C
 // https://www.youtube.com/watch?v=5dA-cyiGKAA&ab_channel=HunterJohnson
+// https://www.dsprelated.com/showthread/adsp/2785-1.php
 
 #include <hellfire.h>
+
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define CRESET "\x1B[0m"
 
 #define BUBBBLESORT_ADDR_SIZE 18
 #define ARR_SIZE 20
 
+#define MAINSTOP //for(;;);
+#define BISTSTOP //for(;;);
+#define ADRCHECKSTOP //for(;;);
+#define LFSRSTOP //for(;;);
+
+#define BT_SABOTADOR_BUBBLE 0 //random() % 3+1 // Sabotador vai do 1 ao 3 (local entre etapas do bist), 0 desativa o sabotador
+#define BS_SABOTADOR_BUBBLE 0 //random() % 3+1
+#define BT_SABOTADOR_ARR 0 // random() % 3+1
+#define BS_SABOTADOR_ARR random() % 3+1
+
+#define REINICIALIZA_ARR // for(i=0;i<ARR_SIZE;i++)arr[i]=ARR_SIZE-i-1;
+
 //int arr_size = sizeof(arr)/sizeof(arr[0]);
 int bist_test_counter = 0;
-int arr[ARR_SIZE];
+int arr[ARR_SIZE] = {20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 
 
 
@@ -43,9 +61,30 @@ void printArray(int arr[], int size)
     printf("\n");
 }
 
+int groundtruth_check(int *addr, int groundtruth){
+    if(*addr != groundtruth){
+        printf(RED"\nFatal Error in memory address %08x:%08x! Expected value:%08x\n"CRESET, addr, *addr, groundtruth);
+        ADRCHECKSTOP
+    }
+}
 
-int LFSR(int v1, int v2){
-    return (v1+v2)>>1;
+int LFSR_check(int sig1, int sig2){
+    if(sig1 != sig2){
+        printf(RED"\nFatal Error in memory! Wrong signature: %08x != %08x!\n"CRESET, sig1, sig2);
+        LFSRSTOP
+    }
+}
+
+int LFSR(int b, int x){
+    int i;
+    // Usando o polinomio primitivo (x^3 + x^2 + 1)
+    //int y4 = (((b >> 0) & 0x1) & ((x >> 0) & 0x1)) ? 1 : 0;
+    //int y3 = (((b >> 2) & 0x1) & ((x >> 2) & 0x1)) ? 1 : 0;
+    //int y2 = (((b >> 11) & 0x1) & ((x >> 11) & 0x1)) ? 1 : 0;
+    //int y1 = (((b >> 19) & 0x1) & ((x >> 19) & 0x1)) ? 1 : 0;
+    //x = x << 1 | (y1 ^ y2 ^ y3 ^ y4);
+    x = x + b;
+    return (x << (32 - 1)) | (x >> 1); // Circular shift
 }
 
 
@@ -87,6 +126,7 @@ void S2(int *addr, int addr_size, int *signature, int *addr_groundtruth){
         value = *addr;
         *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        groundtruth_check(addr, ~(addr_groundtruth[i]));
 
         //Wa
         *addr = ~(value); 
@@ -96,6 +136,7 @@ void S2(int *addr, int addr_size, int *signature, int *addr_groundtruth){
         value = *addr;
         *signature = LFSR(*signature, value);
         printf("\t%08x", value); 
+        groundtruth_check(addr, addr_groundtruth[i]);
 
         //Wa(not)
         *addr = ~(value); 
@@ -118,6 +159,7 @@ void S3(int *addr, int addr_size, int *signature, int *addr_groundtruth){
         value = *addr;
         *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        groundtruth_check(addr, ~(addr_groundtruth[i]));
 
         //Wa
         *addr = ~(value); 
@@ -148,6 +190,7 @@ void S4(int *addr, int addr_size, int *signature, int *addr_groundtruth){
         value = *addr;
         *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        groundtruth_check(addr, addr_groundtruth[i]);
 
         //Wa(not)
         *addr = ~(value); 
@@ -157,6 +200,7 @@ void S4(int *addr, int addr_size, int *signature, int *addr_groundtruth){
         value = *addr;
         *signature = LFSR(*signature, value);
         printf("\t%08x", value); 
+        groundtruth_check(addr, ~(addr_groundtruth[i]));
 
         //Wa
         *addr = ~(value); 
@@ -244,7 +288,7 @@ void S4S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
 }
 
 
-int bist_test(int *addr, int addr_size){
+int bist_test(int *addr, int addr_size, int local_sabotador){
     printf("\n----- BIST TEST -----\n");
     int i;
     int value;
@@ -252,16 +296,18 @@ int bist_test(int *addr, int addr_size){
     int addr_groundtruth[addr_size];
 
     S1(addr, addr_size, &signature, addr_groundtruth); 
+    if(local_sabotador == 1) sabotador(addr, addr_size); // SABOTADOR
     S2(addr, addr_size, &signature, addr_groundtruth);
+    if(local_sabotador == 2) sabotador(addr, addr_size); // SABOTADOR
     S3(addr, addr_size, &signature, addr_groundtruth);
-    sabotador(addr, addr_size); // SABOTADOR
+    if(local_sabotador == 3) sabotador(addr, addr_size); // SABOTADOR
     S4(addr, addr_size, &signature, addr_groundtruth);
 
     printf("bist_test_sum:%08x\n", signature); 
     return signature;
 }
 
-int bist_signature(int *addr, int addr_size){
+int bist_signature(int *addr, int addr_size, int local_sabotador){
     printf("----- BIST SIGNATURE -----\n");
     int i;
     int value;
@@ -269,8 +315,11 @@ int bist_signature(int *addr, int addr_size){
     int addr_groundtruth[addr_size];
 
     S1S(addr, addr_size, &signature, addr_groundtruth);
+    if(local_sabotador == 1) sabotador(addr, addr_size); // SABOTADOR
     S2S(addr, addr_size, &signature, addr_groundtruth);
+    if(local_sabotador == 2) sabotador(addr, addr_size); // SABOTADOR
     S3S(addr, addr_size, &signature, addr_groundtruth);
+    if(local_sabotador == 3) sabotador(addr, addr_size); // SABOTADOR
     S4S(addr, addr_size, &signature, addr_groundtruth);
 
     printf("bist_signature_sum:%08x\n", signature); 
@@ -284,30 +333,31 @@ void bist_th(void) {
 
     printf("\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
     // Bist na area de memória do bubblesort
-    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
-    bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
+    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE, BT_SABOTADOR_BUBBLE);
+    bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE, BS_SABOTADOR_BUBBLE);
     
 
     printf("\nResults BubbleSort:\n");
     printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
     printf("bist_signature_sum:\t%08x\n", bist_signature_sum);
+    LFSR_check(bist_test_sum, bist_signature_sum);
 
     // Bist na area de memória do vetor de dados (arr)
-    bist_test_sum = bist_test(arr, ARR_SIZE);
-    bist_signature_sum = bist_signature(arr, ARR_SIZE);
+    bist_test_sum = bist_test(arr, ARR_SIZE, BT_SABOTADOR_ARR);
+    bist_signature_sum = bist_signature(arr, ARR_SIZE, BS_SABOTADOR_ARR);
 
     printf("\nResults Arr:\n");
     printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
     printf("bist_signature_sum:\t%08x\n", bist_signature_sum);
+    LFSR_check(bist_test_sum, bist_signature_sum);
     //sabotador(arr, ARR_SIZE);
-
     //sabotador(&bubbleSort, 18); // 18 é a quantidade de comandos assembly que implementam o bubblesort
     
     printf("\n---------------------------------\n");
 
     hf_resume(hf_id("main_routine_th"));
-    delay_ms(1000);
-    for(;;);
+    delay_ms(10);
+    BISTSTOP
     //hf_kill(hf_selfid());
 }
 
@@ -342,18 +392,16 @@ void main_routine_th(void) {
 
 
     // Inicialização da array
-    for(i=0;i<ARR_SIZE;i++){
-        arr[i]=ARR_SIZE-i-1;
-    }
+    REINICIALIZA_ARR
 
     printf("\n======\nBefore sorting array: \n");
     printArray(arr, ARR_SIZE);
 
     bubbleSort(arr, ARR_SIZE);
-    printf("After sorting array: \n");
+    printf(GRN"After sorting array: \n"CRESET);
     printArray(arr, ARR_SIZE);
 
-    for(;;);
+    MAINSTOP
     //hf_kill(hf_selfid());
 }
 
