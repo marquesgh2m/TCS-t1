@@ -1,8 +1,9 @@
 // https://en.wikipedia.org/wiki/Bitwise_operations_in_C
+// https://www.youtube.com/watch?v=5dA-cyiGKAA&ab_channel=HunterJohnson
 
 #include <hellfire.h>
 
-#define READ_ONLY 1;
+#define READ_ONLY 1
 #define BUBBBLESORT_ADDR_SIZE 18
 #define ARR_SIZE 20
 
@@ -43,16 +44,25 @@ void printArray(int arr[], int size)
 }
 
 
+int LFSR(int v1, int v2){
+    return ~(v1&v2);
+}
+
+
 void S1(int *addr, int addr_size, int *signature, int read_only){
     int i;
     int value;
+    *addr = 0; 
 
-    printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
+    if(!read_only) printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
+    else printf("S1:\t\t    Ra\n");
+
     for(i=0;i<addr_size;i++){
         //Ra
         value = *addr;
-        *signature = sigsum(*signature, value);
+        *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        if(read_only) printf("\n", value); 
 
         if(!read_only){
             //Wa(not)
@@ -66,9 +76,10 @@ void S1(int *addr, int addr_size, int *signature, int read_only){
             //Wa(not)
             *addr = ~(value); 
             printf("\t%08x\n", *addr); 
-            addr++; 
         }
+        addr++; 
     }
+    printf("Signature1:%08x\n", *signature); 
 }
 
 
@@ -76,31 +87,35 @@ void S2(int *addr, int addr_size, int *signature, int read_only){
     int i;
     int value;
 
-    printf("\nS2:\t\t    Ra(not)\tWa\t\tRa\t\tWa(not)\n");
+    if(!read_only) printf("\nS2:\t\t    Ra(not)\tWa\t\tRa\t\tWa(not)\n");
+    else printf("\nS2:\t\t    Ra(not)\tRa\n");
+    
     for(i=0;i<addr_size;i++){
         //Ra(not)
-        value = ~(*addr);
-        *signature = sigsum(*signature, value);
+        value = *addr;
+        *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         if(!read_only){
             //Wa
-            *addr = value; 
+            *addr = ~(value); 
             printf("\t%08x", *addr); 
         }
 
         //Ra
         value = *addr;
-        *signature = sigsum(*signature, value);
+        *signature = LFSR(*signature, value);
         printf("\t%08x", value); 
+        if(read_only) printf("\n", value); 
 
         if(!read_only){
             //Wa(not)
             *addr = ~(value); 
             printf("\t%08x\n", *addr); 
-            addr++; 
         }
+        addr++; 
     }    
+    printf("Signature2:%08x\n", *signature); 
 }
 
 
@@ -108,28 +123,32 @@ void S3(int *addr, int addr_size, int *signature, int read_only){
     int i;
     int value;
 
-    printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
+    if(!read_only) printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
+    else printf("\nS3:\t\t    Ra(not)\n");
+    
     for(i=0;i<addr_size;i++){
         //Ra(not)
-        value = ~(*addr);
-        *signature = sigsum(*signature, value);
+        value = *addr;
+        *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        if(read_only) printf("\n", value); 
 
         if(!read_only){
             //Wa
-            *addr = value; 
-            printf("\t%08x", *addr); 
-
-            //Wa(not)
             *addr = ~(value); 
             printf("\t%08x", *addr); 
 
-            //Wa
+            //Wa(not)
             *addr = value; 
+            printf("\t%08x", *addr); 
+
+            //Wa
+            *addr = ~(value); 
             printf("\t%08x\n", *addr); 
-            addr++; 
         }
+        addr++; 
     }
+    printf("Signature3:%08x\n", *signature); 
 }
 
 
@@ -137,11 +156,13 @@ void S4(int *addr, int addr_size, int *signature, int read_only){
     int i;
     int value;
 
-    printf("\nS4:\t\t    Ra\tWa(not)\tRa(not)\t\tWa\n");
+    if(!read_only) printf("\nS4:\t\t    Ra\t\tWa(not)\t\tRa(not)\t\tWa\n");
+    else printf("\nS4:\t\t    Ra\t\tRa(not)\t\t\n");
+    
     for(i=0;i<addr_size;i++){
         //Ra
         value = *addr;
-        *signature = sigsum(*signature, value);
+        *signature = LFSR(*signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         if(!read_only){
@@ -151,36 +172,47 @@ void S4(int *addr, int addr_size, int *signature, int read_only){
         }
 
         //Ra(not)
-        value = ~(*addr);
-        *signature = sigsum(*signature, value);
+        value = *addr;
+        *signature = LFSR(*signature, value);
         printf("\t%08x", value); 
+        if(read_only) printf("\n", value); 
 
         if(!read_only){
             //Wa
-            *addr = value; 
+            *addr = ~(value); 
             printf("\t%08x\n", *addr); 
-            addr++; 
         }
+        addr++; 
     }
+    printf("Signature4:%08x\n", *signature); 
 }
-
-
-int sigsum(int v1, int v2){
-    return ~(v1+v2);
-}
-
 
 int bist_test(int *addr, int addr_size){
+    printf("\n----- BIST TEST -----\n");
+    int i;
+    int value;
+    int signature = 0;
+    S1(addr, addr_size, &signature, 0);
+    S2(addr, addr_size, &signature, 0);
+    S3(addr, addr_size, &signature, 0);
+    S4(addr, addr_size, &signature, 0);
+
+    printf("bist_test_sum:%08x\n", signature); 
+    return signature;
+}
+
+int bist_signature(int *addr, int addr_size){
+    printf("----- BIST SIGNATURE -----\n");
     int i;
     int value;
     int signature = 0;
 
-    S1(&addr, addr_size, &signature, 0);
-    S2(&addr, addr_size, &signature, 0);
-    S3(&addr, addr_size, &signature, 0);
-    S4(&addr, addr_size, &signature, 0);
+    S1(addr, addr_size, &signature, READ_ONLY);
+    S2(addr, addr_size, &signature, READ_ONLY);
+    S3(addr, addr_size, &signature, READ_ONLY);
+    S4(addr, addr_size, &signature, READ_ONLY);
 
-    printf("Signature:%08x\n", signature); 
+    printf("bist_signature_sum:%08x\n", signature); 
     return signature;
 }
 
@@ -190,8 +222,12 @@ void bist_th(void) {
     int bist_test_sum, bist_signature_sum;
 
     printf("\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
-    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
 
+    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
+    bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
+
+    printf("bist_test_sum:%08x\n", bist_test_sum); 
+    printf("bist_signature_sum:%08x\n", bist_signature_sum);
     //sabotador(arr, arr_size);
 
     //sabotador(&bubbleSort, 18); // 18 é a quantidade de comandos assembly que implementam o bubblesort
