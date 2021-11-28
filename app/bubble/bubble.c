@@ -4,14 +4,10 @@
 
 #define READ_ONLY 1;
 #define BUBBBLESORT_ADDR_SIZE 18
+#define ARR_SIZE 20
 
-mutex_t m;
-
-int arr[] = {19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
-int arr_size = sizeof(arr)/sizeof(arr[0]);
+//int arr_size = sizeof(arr)/sizeof(arr[0]);
 int bist_test_counter = 0;
-
-
 
 
 // A function to implement bubble sort
@@ -92,10 +88,55 @@ int bist_test(int *addr, int addr_size){
     }
     addr -= addr_size; // Faz com que o ponteiro volte para o inicio do endereço que está sendo testado
     
+    //S3
+    printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
+    for(i=0;i<addr_size;i++){
+        //Ra(not)
+        value = ~(*addr);
+        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+
+        //Wa
+        *addr = value; 
+        printf("\t%08x", *addr); 
+
+        //Wa(not)
+        *addr = ~(value); 
+        printf("\t%08x", *addr); 
+
+        //Wa
+        *addr = value; 
+        printf("\t%08x\n", *addr); 
+        addr++; 
+    }
+    addr -= addr_size; // Faz com que o ponteiro volte para o inicio do endereço que está sendo testado
+
+    //S4
+    printf("\nS4:\t\t    Ra\tWa(not)\tRa(not)\t\tWa\n");
+    for(i=0;i<addr_size;i++){
+        //Ra
+        value = *addr;
+        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+
+        //Wa(not)
+        *addr = ~(value); 
+        printf("\t%08x", *addr); 
+
+        //Ra(not)
+        value = ~(*addr);
+        printf("\t%08x", value); 
+
+        //Wa
+        *addr = value; 
+        printf("\t%08x\n", *addr); 
+        addr++; 
+    }
+      
 }
 //printf("i:%2d *adr:%08x: %08x\n", i, addr, *addr);
 
-void bist(void) {
+void bist_th(void) {
+    hf_block(hf_id("main_routine_th"));
+
     int bist_test_sum, bist_signature_sum;
 
     printf("\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
@@ -104,8 +145,10 @@ void bist(void) {
     //sabotador(arr, arr_size);
 
     //sabotador(&bubbleSort, 18); // 18 é a quantidade de comandos assembly que implementam o bubblesort
-    printf("\n---------------------------------\n");
     
+    printf("\n---------------------------------\n");
+
+    hf_resume(hf_id("main_routine_th"));
     delay_ms(1000);
     for(;;);
     //hf_kill(hf_selfid());
@@ -132,19 +175,27 @@ void sabotador(int *aux, int depth){
 
 }
 
-void main_routine(void) {
+void main_routine_th(void) {
+    int i;
+    int arr[ARR_SIZE];
 
     printf("\nbubbleSort addr: %08x \n", &bubbleSort);
     printf("arr addr: %08x \n", arr);
-    printf("main_routine addr:%x \n", main_routine);
-    printf("main_routine addr:%x \n", &main_routine);
+    printf("main_routine addr:%x \n", main_routine_th);
+    printf("main_routine addr:%x \n", &main_routine_th);
+
+
+    // Inicialização da array
+    for(i=0;i<ARR_SIZE;i++){
+        arr[i]=ARR_SIZE-i-1;
+    }
 
     printf("\n======\nBefore sorting array: \n");
-    printArray(arr, arr_size);
+    printArray(arr, ARR_SIZE);
 
-    bubbleSort(arr, arr_size);
-    printf("Sorted array: \n");
-    printArray(arr, arr_size);
+    bubbleSort(arr, ARR_SIZE);
+    printf("After sorting array: \n");
+    printArray(arr, ARR_SIZE);
 
     for(;;);
     //hf_kill(hf_selfid());
@@ -154,6 +205,6 @@ void app_main(void){
     // Set random seed
     srand(42); //srand(time(NULL)); 
 
-    hf_spawn(bist, 8, 2, 8, "bist thread", 2048);
-    hf_spawn(main_routine, 4, 1, 4, "main_routine thread", 2048);
+    hf_spawn(bist_th, 0, 0, 0, "bist_th", 6000);
+    hf_spawn(main_routine_th, 0, 0, 0, "main_routine_th", 2048);
 }
