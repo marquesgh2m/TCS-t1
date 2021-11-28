@@ -10,6 +10,7 @@
 int bist_test_counter = 0;
 
 
+
 // A function to implement bubble sort
 void bubbleSort(int arr[], int n);
 // Function to print an array 
@@ -41,112 +42,147 @@ void printArray(int arr[], int size)
     printf("\n");
 }
 
-int sigsum(int v1, int v2){
-    return v1+v2;
+
+void S1(int *addr, int addr_size, int *signature, int read_only){
+    int i;
+    int value;
+
+    printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
+    for(i=0;i<addr_size;i++){
+        //Ra
+        value = *addr;
+        *signature = sigsum(*signature, value);
+        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+
+        if(!read_only){
+            //Wa(not)
+            *addr = ~(value); 
+            printf("\t%08x", *addr); 
+
+            //Wa
+            *addr = value; 
+            printf("\t%08x", *addr); 
+
+            //Wa(not)
+            *addr = ~(value); 
+            printf("\t%08x\n", *addr); 
+            addr++; 
+        }
+    }
 }
+
+
+void S2(int *addr, int addr_size, int *signature, int read_only){
+    int i;
+    int value;
+
+    printf("\nS2:\t\t    Ra(not)\tWa\t\tRa\t\tWa(not)\n");
+    for(i=0;i<addr_size;i++){
+        //Ra(not)
+        value = ~(*addr);
+        *signature = sigsum(*signature, value);
+        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+
+        if(!read_only){
+            //Wa
+            *addr = value; 
+            printf("\t%08x", *addr); 
+        }
+
+        //Ra
+        value = *addr;
+        *signature = sigsum(*signature, value);
+        printf("\t%08x", value); 
+
+        if(!read_only){
+            //Wa(not)
+            *addr = ~(value); 
+            printf("\t%08x\n", *addr); 
+            addr++; 
+        }
+    }    
+}
+
+
+void S3(int *addr, int addr_size, int *signature, int read_only){
+    int i;
+    int value;
+
+    printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
+    for(i=0;i<addr_size;i++){
+        //Ra(not)
+        value = ~(*addr);
+        *signature = sigsum(*signature, value);
+        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+
+        if(!read_only){
+            //Wa
+            *addr = value; 
+            printf("\t%08x", *addr); 
+
+            //Wa(not)
+            *addr = ~(value); 
+            printf("\t%08x", *addr); 
+
+            //Wa
+            *addr = value; 
+            printf("\t%08x\n", *addr); 
+            addr++; 
+        }
+    }
+}
+
+
+void S4(int *addr, int addr_size, int *signature, int read_only){
+    int i;
+    int value;
+
+    printf("\nS4:\t\t    Ra\tWa(not)\tRa(not)\t\tWa\n");
+    for(i=0;i<addr_size;i++){
+        //Ra
+        value = *addr;
+        *signature = sigsum(*signature, value);
+        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+
+        if(!read_only){
+            //Wa(not)
+            *addr = ~(value); 
+            printf("\t%08x", *addr); 
+        }
+
+        //Ra(not)
+        value = ~(*addr);
+        *signature = sigsum(*signature, value);
+        printf("\t%08x", value); 
+
+        if(!read_only){
+            //Wa
+            *addr = value; 
+            printf("\t%08x\n", *addr); 
+            addr++; 
+        }
+    }
+}
+
+
+int sigsum(int v1, int v2){
+    return ~(v1+v2);
+}
+
 
 int bist_test(int *addr, int addr_size){
     int i;
     int value;
     int signature = 0;
 
-    //S1
-    printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
-    for(i=0;i<addr_size;i++){
-        //Ra
-        value = *addr;
-        signature = sigsum(signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
-
-        //Wa(not)
-        *addr = ~(value); 
-        printf("\t%08x", *addr); 
-
-        //Wa
-        *addr = value; 
-        printf("\t%08x", *addr); 
-
-        //Wa(not)
-        *addr = ~(value); 
-        printf("\t%08x\n", *addr); 
-        addr++; 
-    }
-    addr -= addr_size; // Faz com que o ponteiro volte para o inicio do endereço que está sendo testado
-    
-    //S2
-    printf("\nS2:\t\t    Ra(not)\tWa\t\tRa\t\tWa(not)\n");
-    for(i=0;i<addr_size;i++){
-        //Ra(not)
-        value = ~(*addr);
-        signature = sigsum(signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
-
-        //Wa
-        *addr = value; 
-        printf("\t%08x", *addr); 
-
-        //Ra
-        value = *addr;
-        signature = sigsum(signature, value);
-        printf("\t%08x", value); 
-
-        //Wa(not)
-        *addr = ~(value); 
-        printf("\t%08x\n", *addr); 
-        addr++; 
-    }
-    addr -= addr_size; // Faz com que o ponteiro volte para o inicio do endereço que está sendo testado
-    
-    //S3
-    printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
-    for(i=0;i<addr_size;i++){
-        //Ra(not)
-        value = ~(*addr);
-        signature = sigsum(signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
-
-        //Wa
-        *addr = value; 
-        printf("\t%08x", *addr); 
-
-        //Wa(not)
-        *addr = ~(value); 
-        printf("\t%08x", *addr); 
-
-        //Wa
-        *addr = value; 
-        printf("\t%08x\n", *addr); 
-        addr++; 
-    }
-    addr -= addr_size; // Faz com que o ponteiro volte para o inicio do endereço que está sendo testado
-
-    //S4
-    printf("\nS4:\t\t    Ra\tWa(not)\tRa(not)\t\tWa\n");
-    for(i=0;i<addr_size;i++){
-        //Ra
-        value = *addr;
-        signature = sigsum(signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
-
-        //Wa(not)
-        *addr = ~(value); 
-        printf("\t%08x", *addr); 
-
-        //Ra(not)
-        value = ~(*addr);
-        signature = sigsum(signature, value);
-        printf("\t%08x", value); 
-
-        //Wa
-        *addr = value; 
-        printf("\t%08x\n", *addr); 
-        addr++; 
-    }
+    S1(&addr, addr_size, &signature, 0);
+    S2(&addr, addr_size, &signature, 0);
+    S3(&addr, addr_size, &signature, 0);
+    S4(&addr, addr_size, &signature, 0);
 
     printf("Signature:%08x\n", signature); 
     return signature;
 }
-//printf("i:%2d *adr:%08x: %08x\n", i, addr, *addr);
 
 void bist_th(void) {
     hf_block(hf_id("main_routine_th"));
