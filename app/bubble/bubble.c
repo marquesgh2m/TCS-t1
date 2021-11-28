@@ -127,7 +127,8 @@ void S3(int *addr, int addr_size, int *signature, int read_only){
     if(!read_only) printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
     else printf("\nS3:\t\t    Ra(not)\n");
     
-    for(i=0;i<addr_size;i++){
+    addr += addr_size-1;
+    for(i=addr_size-1;i>=0;i--){
         //Ra(not)
         if(!read_only) value = *addr;
         else value = ~(*addr);
@@ -148,7 +149,7 @@ void S3(int *addr, int addr_size, int *signature, int read_only){
             *addr = ~(value); 
             printf("\t%08x\n", *addr); 
         }
-        addr++; 
+        addr--; 
     }
     printf("Signature3:%08x\n", *signature); 
 }
@@ -161,7 +162,8 @@ void S4(int *addr, int addr_size, int *signature, int read_only){
     if(!read_only) printf("\nS4:\t\t    Ra\t\tWa(not)\t\tRa(not)\t\tWa\n");
     else printf("\nS4:\t\t    Ra\t\tRa(not)\t\t\n");
     
-    for(i=0;i<addr_size;i++){
+    addr += addr_size-1;
+    for(i=addr_size-1;i>=0;i--){
         //Ra
         value = *addr;
         *signature = LFSR(*signature, value);
@@ -185,7 +187,7 @@ void S4(int *addr, int addr_size, int *signature, int read_only){
             *addr = ~(value); 
             printf("\t%08x\n", *addr); 
         }
-        addr++; 
+        addr--; 
     }
     printf("Signature4:%08x\n", *signature); 
 }
