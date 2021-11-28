@@ -9,6 +9,8 @@
 #define YEL   "\x1B[33m"
 #define CRESET "\x1B[0m"
 
+#define VERBOSE 0 //0 Desativa prints em excesso; 1 Ativa todos os prints
+
 #define BUBBBLESORT_ADDR_SIZE 18
 #define ARR_SIZE 20
 
@@ -19,15 +21,15 @@
 
 #define BT_SABOTADOR_BUBBLE 0 //random() % 3+1 // Sabotador vai do 1 ao 3 (local entre etapas do bist), 0 desativa o sabotador
 #define BS_SABOTADOR_BUBBLE 0 //random() % 3+1
-#define BT_SABOTADOR_ARR 0 // random() % 3+1
-#define BS_SABOTADOR_ARR random() % 3+1
+#define BT_SABOTADOR_ARR random() % 3+1
+#define BS_SABOTADOR_ARR 0 // random() % 3+1
 
 #define REINICIALIZA_ARR // for(i=0;i<ARR_SIZE;i++)arr[i]=ARR_SIZE-i-1;
 
 //int arr_size = sizeof(arr)/sizeof(arr[0]);
 int bist_test_counter = 0;
 int arr[ARR_SIZE] = {20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
-
+int verbose = VERBOSE;
 
 
 // A function to implement bubble sort
@@ -91,205 +93,205 @@ int LFSR(int b, int x){
 void S1(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value; 
 
-    printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
+    if(verbose) printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
     for(i=0;i<addr_size;i++){
         //Ra
         value = *addr;
         addr_groundtruth[i] = *addr; // Salva valor para usar como comparacao nas outras etapas
         *signature = LFSR(*signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         //Wa(not)
         *addr = ~(value); 
-        printf("\t%08x", *addr); 
+        if(verbose) printf("\t%08x", *addr); 
 
         //Wa
         *addr = value; 
-        printf("\t%08x", *addr); 
+        if(verbose) printf("\t%08x", *addr); 
 
         //Wa(not)
         *addr = ~(value); 
-        printf("\t%08x\n", *addr); 
+        if(verbose) printf("\t%08x\n", *addr); 
         
         addr++; 
     }
-    printf("Signature1:%08x\n", *signature); 
+    printf("Signature S1:%08x\n", *signature); 
 }
 
 
 void S2(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
-    printf("\nS2:\t\t    Ra(not)\tWa\t\tRa\t\tWa(not)\n");
+    if(verbose) printf("\nS2:\t\t    Ra(not)\tWa\t\tRa\t\tWa(not)\n");
     for(i=0;i<addr_size;i++){
         //Ra(not)
         value = *addr;
         *signature = LFSR(*signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x", i, addr, value); 
         groundtruth_check(addr, ~(addr_groundtruth[i]));
 
         //Wa
         *addr = ~(value); 
-        printf("\t%08x", *addr); 
+        if(verbose) printf("\t%08x", *addr); 
 
         //Ra
         value = *addr;
         *signature = LFSR(*signature, value);
-        printf("\t%08x", value); 
+        if(verbose) printf("\t%08x", value); 
         groundtruth_check(addr, addr_groundtruth[i]);
 
         //Wa(not)
         *addr = ~(value); 
-        printf("\t%08x\n", *addr); 
+        if(verbose) printf("\t%08x\n", *addr); 
         
         addr++; 
     }    
-    printf("Signature2:%08x\n", *signature); 
+    printf("Signature S2:%08x\n", *signature); 
 }
 
 
 void S3(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
-    printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
+    if(verbose) printf("\nS3:\t\t    Ra(not)\tWa\t\tWa(not)\t\tWa\n");
     
     addr += addr_size-1;
     for(i=addr_size-1;i>=0;i--){
         //Ra(not)
         value = *addr;
         *signature = LFSR(*signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x", i, addr, value); 
         groundtruth_check(addr, ~(addr_groundtruth[i]));
 
         //Wa
         *addr = ~(value); 
-        printf("\t%08x", *addr); 
+        if(verbose) printf("\t%08x", *addr); 
 
         //Wa(not)
         *addr = value; 
-        printf("\t%08x", *addr); 
+        if(verbose) printf("\t%08x", *addr); 
 
         //Wa
         *addr = ~(value); 
-        printf("\t%08x\n", *addr); 
+        if(verbose) printf("\t%08x\n", *addr); 
         
         addr--; 
     }
-    printf("Signature3:%08x\n", *signature); 
+    printf("Signature S3:%08x\n", *signature); 
 }
 
 
 void S4(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
-    printf("\nS4:\t\t    Ra\t\tWa(not)\t\tRa(not)\t\tWa\n");
+    if(verbose) printf("\nS4:\t\t    Ra\t\tWa(not)\t\tRa(not)\t\tWa\n");
     
     addr += addr_size-1;
     for(i=addr_size-1;i>=0;i--){
         //Ra
         value = *addr;
         *signature = LFSR(*signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x", i, addr, value); 
         groundtruth_check(addr, addr_groundtruth[i]);
 
         //Wa(not)
         *addr = ~(value); 
-        printf("\t%08x", *addr); 
+        if(verbose) printf("\t%08x", *addr); 
 
         //Ra(not)
         value = *addr;
         *signature = LFSR(*signature, value);
-        printf("\t%08x", value); 
+        if(verbose) printf("\t%08x", value); 
         groundtruth_check(addr, ~(addr_groundtruth[i]));
 
         //Wa
         *addr = ~(value); 
-        printf("\t%08x\n", *addr); 
+        if(verbose) printf("\t%08x\n", *addr); 
         addr--; 
     }
-    printf("Signature4:%08x\n", *signature); 
+    printf("Signature S4:%08x -> bist_test_sum\n", *signature); 
 }
 
 void S1S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
-    printf("S1S:\t\t    Ra\n");
+    if(verbose) printf("S1S:\t\t    Ra\n");
     for(i=0;i<addr_size;i++){
         //Ra
         value = *addr;
         *signature = LFSR(*signature, value);
-        printf("i:%2d *adr:%08x: %08x\n", i, addr, value); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x\n", i, addr, value); 
 
         addr++; 
     }
-    printf("SignatureS1:%08x\n", *signature); 
+    printf("Signature S1S:%08x\n", *signature); 
 }
 
 
 void S2S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
-    printf("\nS2S:\t\t    Ra(not)\tRa\n");
+    if(verbose) printf("\nS2S:\t\t    Ra(not)\tRa\n");
     for(i=0;i<addr_size;i++){
         //Ra(not)
         value = ~(*addr);
         *signature = LFSR(*signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         //Ra
         value = *addr;
         *signature = LFSR(*signature, value);
-        printf("\t%08x\n", value); 
+        if(verbose) printf("\t%08x\n", value); 
 
         addr++; 
     }    
-    printf("SignatureS2:%08x\n", *signature); 
+    printf("Signature S2S:%08x\n", *signature); 
 }
 
 
 void S3S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
-    printf("\nS3S:\t\t    Ra(not)\n");
+    if(verbose) printf("\nS3S:\t\t    Ra(not)\n");
     
     addr += addr_size-1;
     for(i=addr_size-1;i>=0;i--){
         //Ra(not)
         value = ~(*addr);
         *signature = LFSR(*signature, value);
-        printf("i:%2d *adr:%08x: %08x\n", i, addr, value); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x\n", i, addr, value); 
 
         addr--; 
     }
-    printf("SignatureS3:%08x\n", *signature); 
+    printf("Signature S3S:%08x\n", *signature); 
 }
 
 
 void S4S(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value;
 
-    printf("\nS4S:\t\t    Ra\t\tRa(not)\t\t\n");
+    if(verbose) printf("\nS4S:\t\t    Ra\t\tRa(not)\t\t\n");
     
     addr += addr_size-1;
     for(i=addr_size-1;i>=0;i--){
         //Ra
         value = *addr;
         *signature = LFSR(*signature, value);
-        printf("i:%2d *adr:%08x: %08x", i, addr, value); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         //Ra(not)
         value = ~(*addr);
         *signature = LFSR(*signature, value);
-        printf("\t%08x\n", value); 
+        if(verbose) printf("\t%08x\n", value); 
 
         addr--; 
     }
-    printf("SignatureS4:%08x\n", *signature); 
+    printf("Signature S4S:%08x -> bist_signature_sum\n", *signature); 
 }
 
 
-int bist_test(int *addr, int addr_size, int local_sabotador){
-    printf("\n----- BIST TEST -----\n");
+int bist_test(int *addr, int addr_size, char *test_name, int local_sabotador){
+    printf("\n----- BIST TEST (%s)-----\n", test_name);
     int i;
     int value;
     int signature = 0;
@@ -303,12 +305,11 @@ int bist_test(int *addr, int addr_size, int local_sabotador){
     if(local_sabotador == 3) sabotador(addr, addr_size); // SABOTADOR
     S4(addr, addr_size, &signature, addr_groundtruth);
 
-    printf("bist_test_sum:%08x\n", signature); 
     return signature;
 }
 
-int bist_signature(int *addr, int addr_size, int local_sabotador){
-    printf("----- BIST SIGNATURE -----\n");
+int bist_signature(int *addr, int addr_size, char *test_name, int local_sabotador){
+    printf("----- BIST SIGNATURE (%s)-----\n", test_name);
     int i;
     int value;
     int signature = 0;
@@ -322,7 +323,6 @@ int bist_signature(int *addr, int addr_size, int local_sabotador){
     if(local_sabotador == 3) sabotador(addr, addr_size); // SABOTADOR
     S4S(addr, addr_size, &signature, addr_groundtruth);
 
-    printf("bist_signature_sum:%08x\n", signature); 
     return signature;
 }
 
@@ -331,20 +331,20 @@ void bist_th(void) {
 
     hf_block(hf_id("main_routine_th")); // Evita que o sistema operacional pare o bist na metade para executar a thread main_routine 
 
-    printf("\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
+    printf(CRESET"\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
     // Bist na area de memória do bubblesort
-    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE, BT_SABOTADOR_BUBBLE);
-    bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE, BS_SABOTADOR_BUBBLE);
+    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", BT_SABOTADOR_BUBBLE);
+    bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", BS_SABOTADOR_BUBBLE);
     
-
     printf("\nResults BubbleSort:\n");
     printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
     printf("bist_signature_sum:\t%08x\n", bist_signature_sum);
     LFSR_check(bist_test_sum, bist_signature_sum);
 
+
     // Bist na area de memória do vetor de dados (arr)
-    bist_test_sum = bist_test(arr, ARR_SIZE, BT_SABOTADOR_ARR);
-    bist_signature_sum = bist_signature(arr, ARR_SIZE, BS_SABOTADOR_ARR);
+    bist_test_sum = bist_test(arr, ARR_SIZE, "Arr", BT_SABOTADOR_ARR);
+    bist_signature_sum = bist_signature(arr, ARR_SIZE, "Arr", BS_SABOTADOR_ARR);
 
     printf("\nResults Arr:\n");
     printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
@@ -353,7 +353,7 @@ void bist_th(void) {
     //sabotador(arr, ARR_SIZE);
     //sabotador(&bubbleSort, 18); // 18 é a quantidade de comandos assembly que implementam o bubblesort
     
-    printf("\n---------------------------------\n");
+    printf("\n----------- BIST TEST END ----------\n");
 
     hf_resume(hf_id("main_routine_th"));
     delay_ms(10);
@@ -373,10 +373,11 @@ void sabotador(int *aux, int depth){
 
     for(i=0;i<depth;i++){
         if(i==random_depth){
-            printf("i:%2d *adr:%08x: %08x \tdec(%d){Original}\n", i, aux, *aux, *aux);
+            printf("i:%2d *adr:%08x: %08x dec(%d){Original}", i, aux, *aux, *aux);
             *aux ^= 1UL << random_bit;
+            printf(" -> %08x dec(%d){Sabotado}\n", *aux, *aux);
         }
-        printf("i:%2d *adr:%08x: %08x \tdec(%d)\n", i, aux, *aux, *aux); 
+        if(verbose) printf("i:%2d *adr:%08x: %08x \tdec(%d)\n", i, aux, *aux, *aux); 
         aux++;
     }
 
