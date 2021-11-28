@@ -41,14 +41,21 @@ void printArray(int arr[], int size)
     printf("\n");
 }
 
+int sigsum(int v1, int v2){
+    return v1+v2;
+}
+
 int bist_test(int *addr, int addr_size){
     int i;
     int value;
+    int signature = 0;
+
     //S1
     printf("S1:\t\t    Ra\t\tWa(not)\t\tWa\t\tWa(not)\n");
     for(i=0;i<addr_size;i++){
         //Ra
         value = *addr;
+        signature = sigsum(signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         //Wa(not)
@@ -71,6 +78,7 @@ int bist_test(int *addr, int addr_size){
     for(i=0;i<addr_size;i++){
         //Ra(not)
         value = ~(*addr);
+        signature = sigsum(signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         //Wa
@@ -79,6 +87,7 @@ int bist_test(int *addr, int addr_size){
 
         //Ra
         value = *addr;
+        signature = sigsum(signature, value);
         printf("\t%08x", value); 
 
         //Wa(not)
@@ -93,6 +102,7 @@ int bist_test(int *addr, int addr_size){
     for(i=0;i<addr_size;i++){
         //Ra(not)
         value = ~(*addr);
+        signature = sigsum(signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         //Wa
@@ -115,6 +125,7 @@ int bist_test(int *addr, int addr_size){
     for(i=0;i<addr_size;i++){
         //Ra
         value = *addr;
+        signature = sigsum(signature, value);
         printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         //Wa(not)
@@ -123,6 +134,7 @@ int bist_test(int *addr, int addr_size){
 
         //Ra(not)
         value = ~(*addr);
+        signature = sigsum(signature, value);
         printf("\t%08x", value); 
 
         //Wa
@@ -130,7 +142,9 @@ int bist_test(int *addr, int addr_size){
         printf("\t%08x\n", *addr); 
         addr++; 
     }
-      
+
+    printf("Signature:%08x\n", signature); 
+    return signature;
 }
 //printf("i:%2d *adr:%08x: %08x\n", i, addr, *addr);
 
@@ -140,7 +154,7 @@ void bist_th(void) {
     int bist_test_sum, bist_signature_sum;
 
     printf("\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
-    bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
+    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE);
 
     //sabotador(arr, arr_size);
 
