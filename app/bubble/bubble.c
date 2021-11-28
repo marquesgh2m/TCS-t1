@@ -6,18 +6,15 @@ void bubbleSort(int arr[], int n);
 void printArray(int arr[], int size);
 
 void bs(void) {
-    int arr[] = {
-            7, 42, 53, 35, 21, 35, 31, 56, 90, 15,
-            64, 78, 52, 18, 52, 93, 31, 53, 89, 66
-    };
-    int n = sizeof(arr)/sizeof(arr[0]);
+    int arr[] = {19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+    int arr_size = sizeof(arr)/sizeof(arr[0]);
 
-    printf("Before sorting array: \n");
-    printArray(arr, n);
+    printf("\n======\nBefore sorting array: \n");
+    printArray(arr, arr_size);
 
-    bubbleSort(arr, n);
-    printf("\nSorted array: \n");
-    printArray(arr, n);
+    bubbleSort(arr, arr_size);
+    printf("Sorted array: \n");
+    printArray(arr, arr_size);
 
 //    for(;;);
 }
@@ -35,28 +32,19 @@ void sabota(void) {
     for(;;);
 }
 
-void app_main(void){
-    hf_spawn(sabota, 0, 0, 0, "sabota", 2048);
-    hf_spawn(bs, 0, 0, 0, "bs", 2048);
-}
-
-void swap(int *xp, int *yp)
-{
-    int temp = *xp;
-    *xp = *yp;
-    *yp = temp;
-}
-
 // A function to implement bubble sort
 void bubbleSort(int arr[], int n)
 {
-    int i, j;
+    int i, j, temp;
     for (i = 0; i < n-1; i++)
 
         // Last i elements are already in place
         for (j = 0; j < n-i-1; j++)
-            if (arr[j] > arr[j+1])
-                swap(&arr[j], &arr[j+1]);
+            if (arr[j] > arr[j+1]){
+                temp = arr[j];
+                arr[j]   = arr[j+1];
+                arr[j+1] = temp;
+            }
 }
 
 /* Function to print an array */
@@ -66,4 +54,9 @@ void printArray(int arr[], int size)
     for (i=0; i < size; i++)
         printf("%d ", arr[i]);
     printf("\n");
+}
+
+void app_main(void){
+    hf_spawn(sabota, 0, 0, 0, "sabota", 2048);
+    hf_spawn(bs, 0, 0, 0, "bs", 2048);
 }
