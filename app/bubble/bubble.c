@@ -11,11 +11,11 @@
 
 #define VERBOSE 0 //0 Desativa prints em excesso; 1 Ativa todos os prints
 
-#define BUBBBLESORT_ADDR_SIZE 18
+#define BUBBBLESORT_ADDR_SIZE 18 // Quantidade de comandos assembly que implementam o bubblesort
 #define ARR_SIZE 20
 
-#define MAINSTOP //for(;;);
-#define BISTSTOP //for(;;);
+#define MAINSTOP //for(;;); //hf_kill(hf_selfid());
+#define BISTSTOP //for(;;); //hf_kill(hf_selfid());
 #define ADRCHECKSTOP //for(;;);
 #define LFSRSTOP //for(;;);
 
@@ -323,10 +323,10 @@ void bist_th(void) {
     hf_block(hf_id("main_routine_th")); // Evita que o sistema operacional pare o bist na metade para executar a thread main_routine 
 
     printf(CRESET"\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
+    
     // Bist na area de memória do bubblesort
     bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", BT_SABOTADOR_BUBBLE);
     bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", BS_SABOTADOR_BUBBLE);
-    
     printf("\nResults BubbleSort:\n");
     printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
     printf("bist_signature_sum:\t%08x\n", bist_signature_sum);
@@ -336,20 +336,16 @@ void bist_th(void) {
     // Bist na area de memória do vetor de dados (arr)
     bist_test_sum = bist_test(arr, ARR_SIZE, "Arr", BT_SABOTADOR_ARR);
     bist_signature_sum = bist_signature(arr, ARR_SIZE, "Arr", BS_SABOTADOR_ARR);
-
     printf("\nResults Arr:\n");
     printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
     printf("bist_signature_sum:\t%08x\n", bist_signature_sum);
     LFSR_check(bist_test_sum, bist_signature_sum);
-    //sabotador(arr, ARR_SIZE);
-    //sabotador(&bubbleSort, 18); // 18 é a quantidade de comandos assembly que implementam o bubblesort
-    
+
     printf("\n----------- BIST TEST END ----------\n");
 
     hf_resume(hf_id("main_routine_th"));
     delay_ms(10);
     BISTSTOP
-    //hf_kill(hf_selfid());
 }
 
 
@@ -371,7 +367,6 @@ void sabotador(int *aux, int depth){
         if(verbose) printf("i:%2d *adr:%08x: %08x \tdec(%d)\n", i, aux, *aux, *aux); 
         aux++;
     }
-
 }
 
 void main_routine_th(void) {
@@ -381,7 +376,6 @@ void main_routine_th(void) {
     printf("arr addr: %08x \n", arr);
     printf("main_routine addr:%x \n", main_routine_th);
     printf("main_routine addr:%x \n", &main_routine_th);
-
 
     // Inicialização da array
     REINICIALIZA_ARR
@@ -394,7 +388,6 @@ void main_routine_th(void) {
     printArray(arr, ARR_SIZE);
 
     MAINSTOP
-    //hf_kill(hf_selfid());
 }
 
 void app_main(void){
