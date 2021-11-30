@@ -320,11 +320,11 @@ int bist_signature(int *addr, int addr_size, char *test_name, int local_sabotado
 void bist_th(void) {
     int bist_test_sum, bist_signature_sum;
 
-    hf_block(hf_id("main_routine_th")); // Evita que o sistema operacional pare o bist na metade para executar a thread main_routine 
+    hf_block(hf_id("main_routine_th")); // Evita que o sistema operacional pare o BIST na metade para executar a thread main_routine_th
 
     printf(CRESET"\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
     
-    // Bist na area de memória do bubblesort
+    // Bist na area de memória que hospeda o código do bubblesort
     bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", BT_SABOTADOR_BUBBLE);
     bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", BS_SABOTADOR_BUBBLE);
     printf("\nResults BubbleSort:\n");
@@ -333,7 +333,7 @@ void bist_th(void) {
     LFSR_check(bist_test_sum, bist_signature_sum);
 
 
-    // Bist na area de memória do vetor de dados (arr)
+    // Bist na area de memória que hospeda o vetor de dados (arr)
     bist_test_sum = bist_test(arr, ARR_SIZE, "Arr", BT_SABOTADOR_ARR);
     bist_signature_sum = bist_signature(arr, ARR_SIZE, "Arr", BS_SABOTADOR_ARR);
     printf("\nResults Arr:\n");
