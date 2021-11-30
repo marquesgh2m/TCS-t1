@@ -26,26 +26,17 @@
 
 #define REINICIALIZA_ARR // for(i=0;i<ARR_SIZE;i++)arr[i]=ARR_SIZE-i-1;
 
-//int arr_size = sizeof(arr)/sizeof(arr[0]);
+
 int bist_test_counter = 0;
 int arr[ARR_SIZE] = {20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 int verbose = VERBOSE;
 
 
-// A function to implement bubble sort
-void bubbleSort(int arr[], int n);
-// Function to print an array 
-void printArray(int arr[], int size);
-// Main routine that call bubble an print out the sorted array
-void main_routine(void);
-
-
-// A function to implement bubble sort
+// Função que implementa o Bubblesort que será sabotado
 void bubbleSort(int arr[], int n)
 {
     int i, j, temp;
     for (i = 0; i < n-1; i++)
-        // Last i elements are already in place
         for (j = 0; j < n-i-1; j++)
             if (arr[j] > arr[j+1]){
                 temp = arr[j];
