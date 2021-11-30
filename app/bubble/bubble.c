@@ -6,10 +6,10 @@
 
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"
-#define YEL   "\x1B[33m"
+#define YEW   "\x1B[33m"
 #define CRESET "\x1B[0m"
 
-#define VERBOSE 0 //0 Desativa prints em excesso; 1 Ativa todos os prints
+#define VERBOSE 1 //0 Desativa prints em excesso; 1 Ativa todos os prints
 
 #define BUBBBLESORT_ADDR_SIZE 18 // Quantidade de comandos assembly que implementam o bubblesort
 #define ARR_SIZE 20
@@ -350,23 +350,21 @@ void bist_th(void) {
 }
 
 
-void sabotador(int *aux, int depth){
+void sabotador(int *addr, int addr_size){
     int i;
-    int random_depth = random() % depth; // Seleciona um valor entre 0 a N
+    int random_adress = random() % addr_size; // Seleciona um valor entre 0 a N
     int random_bit = random() % 32;
-    int random_adress = (int)(aux)+random_depth*4;
 
-    //printf("RandomAdress(%d): %08x, RandomBit:%d\n", random_depth, random_adress, random_bit);
     //printf("FirstAddress: %08x, depth:%d\n", aux, depth);
 
-    for(i=0;i<depth;i++){
-        if(i==random_depth){
-            printf("i:%2d *adr:%08x: %08x dec(%d){Original}", i, aux, *aux, *aux);
-            *aux ^= 1UL << random_bit;
-            printf(" -> %08x dec(%d){Sabotado}\n", *aux, *aux);
+    for(i=0;i<addr_size;i++){
+        if(i==random_adress){
+            printf(YEW"i:%2d *adr:%08x: %08x dec(%d){Original}", i, addr, *addr, *addr);
+            *addr ^= 1UL << random_bit;
+            printf(" -> %08x dec(%d){Sabotado}\n"CRESET, *addr, *addr);
         }
-        if(verbose) printf("i:%2d *adr:%08x: %08x \tdec(%d)\n", i, aux, *aux, *aux); 
-        aux++;
+        //if(verbose) printf("i:%2d *adr:%08x: %08x \tdec(%d)\n", i, addr, *addr, *addr); 
+        addr++;
     }
 }
 
