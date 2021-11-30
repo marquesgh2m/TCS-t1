@@ -372,15 +372,13 @@ void sabotador(int *aux, int depth){
 void main_routine_th(void) {
     int i;
 
-    printf("\nbubbleSort addr: %08x \n", &bubbleSort);
-    printf("arr addr: %08x \n", arr);
-    printf("main_routine addr:%x \n", main_routine_th);
-    printf("main_routine addr:%x \n", &main_routine_th);
+    printf("\n======\nBubbleSort addr: %08x \n", &bubbleSort);
+    printf("Arr addr: %08x \n\n", arr);
 
     // Inicialização da array
     REINICIALIZA_ARR
 
-    printf("\n======\nBefore sorting array: \n");
+    printf("Before sorting array: \n");
     printArray(arr, ARR_SIZE);
 
     bubbleSort(arr, ARR_SIZE);
