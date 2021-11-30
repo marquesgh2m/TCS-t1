@@ -320,7 +320,8 @@ int bist_signature(int *addr, int addr_size, char *test_name, int local_sabotado
 void bist_th(void) {
     int bist_test_sum, bist_signature_sum;
 
-    hf_block(hf_id("main_routine_th")); // Evita que o sistema operacional pare o BIST na metade para executar a thread main_routine_th
+    // Evita que o sistema operacional pare o BIST na metade para executar a thread main_routine_th
+    hf_block(hf_id("main_routine_th")); 
 
     printf(CRESET"\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
     
