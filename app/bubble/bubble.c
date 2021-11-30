@@ -398,9 +398,9 @@ void main_routine_th(void) {
 }
 
 void app_main(void){
-    // Set random seed
+    // Define uma semente para testes pseudorandomicos controlados
     srand(42); //srand(time(NULL)); 
 
-    hf_spawn(bist_th, 0, 0, 0, "bist_th", 6000);
+    hf_spawn(bist_th, 0, 0, 0, "bist_th", 2048);
     hf_spawn(main_routine_th, 0, 0, 0, "main_routine_th", 2048);
 }
