@@ -20,7 +20,7 @@
 #define LFSRSTOP //for(;;);
 
 
-#define SABOTADOR_BUBBLE 0 //random() % 6+1 // Sabotador vai do 1 ao 6 (local entre etapas do bist), 0 desativa o sabotador
+#define SABOTADOR_BUBBLE 0 //random() % 6+1 // Sabotador vai do 1 ao 6 (local entre etapas do bist), 0 desativa o sabotador (Se bota 18 que é o valor do bubble quando roda o bist do arr o código vai acessar uma area fora do vetor)
 #define SABOTADOR_ARR 0 //random() % 6+1
 
 #define REINICIALIZA_ARR  for(i=0;i<ARR_SIZE;i++)arr[i]=ARR_SIZE-i-1;
