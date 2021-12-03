@@ -55,9 +55,9 @@ void printArray(int arr[], int size)
 }
 
 
-int groundtruth_check(int sig1, int sig2, int *addr){
+int groundtruth_check(int sig1, int sig2, int *addr, char *phase){
     if(sig1 != sig2){
-        printf(RED"\nFatal Error in memory address %08x:%08x! Wrong signature:%08x != %08x(Groundtruth)\n"CRESET, addr, *addr, sig2, sig1);
+        printf(RED"\n%s: Fatal Error in memory address %08x:%08x! Wrong signature:%08x != %08x(Groundtruth)\n"CRESET, phase, addr, *addr, sig2, sig1);
         ADRCHECKSTOP
     }
 }
@@ -202,7 +202,7 @@ void S4(int *addr, int addr_size, int *signature){
         addr_groundtruth[3][i] = *signature;  
         addr--; 
     }
-    printf("Signature S4:%08x -> bist_test_sum\n", *signature); 
+    printf("Signature S4:%08x\n", *signature); 
 }
 
 void S1S(int *addr, int addr_size, int *signature){
@@ -216,7 +216,7 @@ void S1S(int *addr, int addr_size, int *signature){
         if(verbose) printf("i:%2d *adr:%08x: %08x", i, addr, value); 
 
         if(verbose) printf("\t%08x\n", *signature);
-        groundtruth_check(addr_groundtruth[0][i], *signature, addr);
+        groundtruth_check(addr_groundtruth[0][i], *signature, addr, "S1S");
         addr++; 
     }
     printf("Signature S1S:%08x\n", *signature); 
@@ -239,7 +239,7 @@ void S2S(int *addr, int addr_size, int *signature){
         if(verbose) printf("\t%08x", value); 
 
         if(verbose) printf("\t%08x\n", *signature);
-        groundtruth_check(addr_groundtruth[1][i], *signature, addr);
+        groundtruth_check(addr_groundtruth[1][i], *signature, addr, "S2S");
         addr++; 
     }    
     printf("Signature S2S:%08x\n", *signature); 
@@ -259,7 +259,7 @@ void S3S(int *addr, int addr_size, int *signature){
         if(verbose) printf("i:%2d *adr:%08x: %08x", i, addr, value);
 
         if(verbose) printf("\t%08x\n", *signature);
-        groundtruth_check(addr_groundtruth[2][i], *signature, addr);
+        groundtruth_check(addr_groundtruth[2][i], *signature, addr, "S3S");
         addr--; 
     }
     printf("Signature S3S:%08x\n", *signature); 
@@ -284,10 +284,10 @@ void S4S(int *addr, int addr_size, int *signature){
         if(verbose) printf("\t%08x", value); 
 
         if(verbose) printf("\t%08x\n", *signature);
-        groundtruth_check(addr_groundtruth[3][i], *signature, addr); 
+        groundtruth_check(addr_groundtruth[3][i], *signature, addr, "S4S"); 
         addr--; 
     }
-    printf("Signature S4S:%08x -> bist_signature_sum\n", *signature); 
+    printf("Signature S4S:%08x\n", *signature); 
 }
 
 
@@ -336,17 +336,10 @@ void bist_th(void) {
     // Bist na area de memória que hospeda o código do bubblesort
     bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", SABOTADOR_BUBBLE);
     bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", SABOTADOR_BUBBLE);
-    printf("\nResults BubbleSort:\n");
-    printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
-    printf("bist_signature_sum:\t%08x\n", bist_signature_sum);;
-
 
     // Bist na area de memória que hospeda o vetor de dados (arr)
     bist_test_sum = bist_test(arr, ARR_SIZE, "Arr", SABOTADOR_ARR);
     bist_signature_sum = bist_signature(arr, ARR_SIZE, "Arr", SABOTADOR_ARR);
-    printf("\nResults Arr:\n");
-    printf("bist_test_sum:\t\t%08x\n", bist_test_sum); 
-    printf("bist_signature_sum:\t%08x\n", bist_signature_sum);
 
     printf("\n----------- BIST TEST END ----------\n");
 
