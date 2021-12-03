@@ -18,13 +18,13 @@
 #define BISTSTOP //for(;;); //hf_kill(hf_selfid());
 #define ADRCHECKSTOP //for(;;);
 #define LFSRSTOP //for(;;);
-#define FAULTMASKSTOP for(;;);
+#define FAULTMASKSTOP // for(;;);
 
 
-#define SABOTADOR_RANDOM random() % 6+6+1 //random() % 12+1 // Sabotador vai do 1 ao 12 Bubble(1,2,3,4,5,6) Arr(7,8,9,10,11,12) (local entre etapas do bist), 0 desativa o sabotador (Se bota 18 que é o valor do bubble quando roda o bist do arr o código vai acessar uma area fora do vetor)
+#define SABOTADOR_RANDOM 0 //random() % 6+6+1 //random() % 12+1 // Sabotador vai do 1 ao 12 Bubble(1,2,3,4,5,6) Arr(7,8,9,10,11,12) (local entre etapas do bist), 0 desativa o sabotador (Se bota 18 que é o valor do bubble quando roda o bist do arr o código vai acessar uma area fora do vetor)
 
 
-#define REINICIALIZA_ARR  for(i=0;i<ARR_SIZE;i++)arr[i]=ARR_SIZE-i-1;
+#define REINICIALIZA_ARR  //for(i=0;i<ARR_SIZE;i++)arr[i]=ARR_SIZE-i-1;
 
 
 int bist_test_counter = 0;
