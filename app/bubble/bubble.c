@@ -21,7 +21,7 @@
 
 
 #define SABOTADOR_BUBBLE 0 //random() % 6+1 // Sabotador vai do 1 ao 6 (local entre etapas do bist), 0 desativa o sabotador (Se bota 18 que é o valor do bubble quando roda o bist do arr o código vai acessar uma area fora do vetor)
-#define SABOTADOR_ARR 0 //random() % 6+1
+#define SABOTADOR_ARR random() % 6+1
 
 #define REINICIALIZA_ARR  for(i=0;i<ARR_SIZE;i++)arr[i]=ARR_SIZE-i-1;
 
@@ -30,6 +30,7 @@ int bist_test_counter = 0;
 int arr[ARR_SIZE] = {20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
 int verbose = VERBOSE;
 int addr_groundtruth[4][20]; // 4 devido as 4 etapas de bist e 20 por que entre Arr e Bubble o Arr tem a area de memória maior
+int fault_mask_flag = 0; // variavel para testar se um erro escapou do bist
 
 
 // Função que implementa o Bubblesort que será sabotado
@@ -58,6 +59,8 @@ void printArray(int arr[], int size)
 int groundtruth_check(int sig1, int sig2, int *addr, char *phase){
     if(sig1 != sig2){
         printf(RED"\n%s: Fatal Error in memory address %08x:%08x! Wrong signature:%08x != %08x(Groundtruth)\n"CRESET, phase, addr, *addr, sig2, sig1);
+        
+        fault_mask_flag = 0; // Conseguiu achar a falha
         ADRCHECKSTOP
     }
 }
@@ -309,7 +312,7 @@ int bist_test(int *addr, int addr_size, char *test_name, int local_sabotador){
 }
 
 int bist_signature(int *addr, int addr_size, char *test_name, int local_sabotador){
-    printf("----- BIST SIGNATURE (%s)-----\n", test_name);
+    printf("\n----- BIST SIGNATURE (%s)-----\n", test_name);
     int i;
     int value;
     int signature = 0;
@@ -330,6 +333,12 @@ void bist_th(void) {
 
     // Evita que o sistema operacional pare o BIST na metade para executar a thread main_routine_th
     hf_block(hf_id("main_routine_th")); 
+
+    // Para a execução se encontra um erro de Fault Mask
+    if(fault_mask_flag){
+        printf(RED"\nBIST Fault Mask Error: BIST lost an error!\n"CRESET);
+        for(;;);
+    }
 
     printf(CRESET"\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
     
@@ -366,6 +375,7 @@ void sabotador(int *addr, int addr_size){
         }
         addr++;
     }
+    fault_mask_flag = 1; // Variavel para ver se o erro escapou do bist 
     printf("------\n");
 }
 
