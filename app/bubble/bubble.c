@@ -68,18 +68,23 @@ int LFSR_check(int sig1, int sig2){
     }
 }
 
-int LFSR(int b, int x){
-    int i;
-    // Usando o polinomio primitivo (x^3 + x^2 + 1)
-    //int y4 = (((b >> 0) & 0x1) & ((x >> 0) & 0x1)) ? 1 : 0;
-    //int y3 = (((b >> 2) & 0x1) & ((x >> 2) & 0x1)) ? 1 : 0;
-    //int y2 = (((b >> 11) & 0x1) & ((x >> 11) & 0x1)) ? 1 : 0;
-    //int y1 = (((b >> 19) & 0x1) & ((x >> 19) & 0x1)) ? 1 : 0;
-    //x = x << 1 | (y1 ^ y2 ^ y3 ^ y4);
-    x = x + b;
-    return (x << (32 - 1)) | (x >> 1); // Circular shift
+int LFSR(int signature, int value){
+    // Usando o polinomio primitivo (x^31 + x^30 + 1)
+    signature ^= value;
+    signature ^= (((signature >> 31) ^ (signature >> 30)) & 0x00000001);
+    return (signature << 31) | (signature >> 1); // Circular shift
 }
 
+void LFSR_DEBUG(){
+    int i;
+    int signature = 0x01;
+    printf("LFSR Debug\n");
+    for(i=0; i<32; i++){
+        signature = LFSR(signature, 0x00);
+        printf("%08x\n", signature);
+    }
+    //for(;;);
+}
 
 void S1(int *addr, int addr_size, int *signature, int *addr_groundtruth){
     int i, value; 
