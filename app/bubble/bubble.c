@@ -18,6 +18,7 @@
 #define BISTSTOP //for(;;); //hf_kill(hf_selfid());
 #define ADRCHECKSTOP //for(;;);
 #define LFSRSTOP //for(;;);
+#define FAULTMASKSTOP for(;;);
 
 
 #define SABOTADOR_BUBBLE 0 //random() % 6+1 // Sabotador vai do 1 ao 6 (local entre etapas do bist), 0 desativa o sabotador (Se bota 18 que é o valor do bubble quando roda o bist do arr o código vai acessar uma area fora do vetor)
@@ -337,7 +338,7 @@ void bist_th(void) {
     // Para a execução se encontra um erro de Fault Mask
     if(fault_mask_flag){
         printf(RED"\nBIST Fault Mask Error: BIST lost an error!\n"CRESET);
-        for(;;);
+        FAULTMASKSTOP
     }
 
     printf(CRESET"\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
