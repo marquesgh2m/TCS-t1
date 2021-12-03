@@ -9,7 +9,7 @@
 #define YEW   "\x1B[33m"
 #define CRESET "\x1B[0m"
 
-#define VERBOSE 0 //0 Desativa prints em excesso; 1 Ativa todos os prints
+#define VERBOSE 0 //0 Desativa prints em excesso; 1 Ativa todos os prints; -1 Remove todo e qualquer print
 
 #define BUBBBLESORT_ADDR_SIZE 18 // Quantidade de comandos assembly que implementam o bubblesort
 #define ARR_SIZE 20
@@ -21,8 +21,8 @@
 #define FAULTMASKSTOP for(;;);
 
 
-#define SABOTADOR_BUBBLE 0 //random() % 6+1 // Sabotador vai do 1 ao 6 (local entre etapas do bist), 0 desativa o sabotador (Se bota 18 que é o valor do bubble quando roda o bist do arr o código vai acessar uma area fora do vetor)
-#define SABOTADOR_ARR random() % 6+1
+#define SABOTADOR_RANDOM random() % 6+6+1 //random() % 12+1 // Sabotador vai do 1 ao 12 Bubble(1,2,3,4,5,6) Arr(7,8,9,10,11,12) (local entre etapas do bist), 0 desativa o sabotador (Se bota 18 que é o valor do bubble quando roda o bist do arr o código vai acessar uma area fora do vetor)
+
 
 #define REINICIALIZA_ARR  for(i=0;i<ARR_SIZE;i++)arr[i]=ARR_SIZE-i-1;
 
@@ -295,35 +295,35 @@ void S4S(int *addr, int addr_size, int *signature){
 }
 
 
-int bist_test(int *addr, int addr_size, char *test_name, int local_sabotador){
-    printf("\n----- BIST TEST (%s)-----\n", test_name);
+int bist_test(int *addr, int addr_size, char *test_name, int sabotador_id){
+    printf("\n----- BIST TEST (%s) SabotadorId=%d-----\n", test_name, sabotador_id);
     int i;
     int value;
     int signature = 0;
 
     S1(addr, addr_size, &signature); 
-    if(local_sabotador == 1) sabotador(addr, addr_size); // SABOTADOR
+    if(sabotador_id == 1) sabotador(addr, addr_size); // SABOTADOR
     S2(addr, addr_size, &signature);
-    if(local_sabotador == 2) sabotador(addr, addr_size); // SABOTADOR
+    if(sabotador_id == 2) sabotador(addr, addr_size); // SABOTADOR
     S3(addr, addr_size, &signature);
-    if(local_sabotador == 3) sabotador(addr, addr_size); // SABOTADOR
+    if(sabotador_id == 3) sabotador(addr, addr_size); // SABOTADOR
     S4(addr, addr_size, &signature);
 
     return signature;
 }
 
-int bist_signature(int *addr, int addr_size, char *test_name, int local_sabotador){
-    printf("\n----- BIST SIGNATURE (%s)-----\n", test_name);
+int bist_signature(int *addr, int addr_size, char *test_name, int sabotador_id){
+    printf("\n----- BIST SIGNATURE (%s) SabotadorId=%d-----\n", test_name, sabotador_id);
     int i;
     int value;
     int signature = 0;
 
     S1S(addr, addr_size, &signature);
-    if(local_sabotador == 4) sabotador(addr, addr_size); // SABOTADOR
+    if(sabotador_id == 4) sabotador(addr, addr_size); // SABOTADOR
     S2S(addr, addr_size, &signature);
-    if(local_sabotador == 5) sabotador(addr, addr_size); // SABOTADOR
+    if(sabotador_id == 5) sabotador(addr, addr_size); // SABOTADOR
     S3S(addr, addr_size, &signature);
-    if(local_sabotador == 6) sabotador(addr, addr_size); // SABOTADOR
+    if(sabotador_id == 6) sabotador(addr, addr_size); // SABOTADOR
     S4S(addr, addr_size, &signature);
 
     return signature;
@@ -338,18 +338,25 @@ void bist_th(void) {
     // Para a execução se encontra um erro de Fault Mask
     if(fault_mask_flag){
         printf(RED"\nBIST Fault Mask Error: BIST lost an error!\n"CRESET);
+        printArray(arr, ARR_SIZE);
+        bubbleSort(arr, ARR_SIZE);
+        printArray(arr, ARR_SIZE);
         FAULTMASKSTOP
     }
 
-    printf(CRESET"\n------------ BIST TEST ------------(%d)\n", bist_test_counter++);
-    
+    int sabotador_id  = SABOTADOR_RANDOM;
+    int sabotador_id_bubble = sabotador_id>6?0:sabotador_id;
+    int sabotador_id_arr = sabotador_id>6?sabotador_id-6:0;
+
+
+    printf(CRESET"\n------------ BIST TEST ------------(%d) SID:%d\n", 1+bist_test_counter++, sabotador_id);
     // Bist na area de memória que hospeda o código do bubblesort
-    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", SABOTADOR_BUBBLE);
-    bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", SABOTADOR_BUBBLE);
+    bist_test_sum = bist_test(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", sabotador_id_bubble);
+    bist_signature_sum = bist_signature(&bubbleSort, BUBBBLESORT_ADDR_SIZE, "Bubble", sabotador_id_bubble);
 
     // Bist na area de memória que hospeda o vetor de dados (arr)
-    bist_test_sum = bist_test(arr, ARR_SIZE, "Arr", SABOTADOR_ARR);
-    bist_signature_sum = bist_signature(arr, ARR_SIZE, "Arr", SABOTADOR_ARR);
+    bist_test_sum = bist_test(arr, ARR_SIZE, "Arr", sabotador_id_arr);
+    bist_signature_sum = bist_signature(arr, ARR_SIZE, "Arr", sabotador_id_arr);
 
     printf("\n----------- BIST TEST END ----------\n");
 
